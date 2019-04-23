@@ -1,24 +1,29 @@
 package main;
 
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 
-public class Main extends KeyAdapter {
+public class Main implements NativeKeyListener {
 
     private Robot robot = new Robot();
     private Rectangle area = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-    private JFrame jFrame = new JFrame();
 
     public void setup() {
-        jFrame.setSize(100, 100);
-        jFrame.setVisible(true);
-        jFrame.addKeyListener(this);
+        try {
+            GlobalScreen.registerNativeHook();
+        } catch (NativeHookException e) {
+            e.printStackTrace();
+        }
+        GlobalScreen.addNativeKeyListener(this);
     }
-
 
     private Main() throws AWTException {}
 
@@ -28,9 +33,9 @@ public class Main extends KeyAdapter {
     }
 
     private int getRGBDistance(Color c1, Color c2) {
-        int diffRed   = Math.abs(c1.getRed() - c2.getRed());
+        int diffRed = Math.abs(c1.getRed() - c2.getRed());
         int diffGreen = Math.abs(c1.getGreen() - c2.getGreen());
-        int diffBlue  = Math.abs(c1.getBlue() - c2.getBlue());
+        int diffBlue = Math.abs(c1.getBlue() - c2.getBlue());
         return diffRed + diffGreen + diffBlue;
     }
 
@@ -46,12 +51,20 @@ public class Main extends KeyAdapter {
         }
     }
 
-    public void keyPressed(KeyEvent e) {
-        System.out.println("ja");
-        int key = e.getKeyCode();
-        if(key == KeyEvent.VK_SPACE){
+    @Override
+    public void nativeKeyPressed(NativeKeyEvent event) {
+
+    }
+
+    @Override
+    public void nativeKeyReleased(NativeKeyEvent event) {
+
+    }
+
+    @Override
+    public void nativeKeyTyped(NativeKeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.VK_SPACE) {
             start();
         }
     }
-
 }
